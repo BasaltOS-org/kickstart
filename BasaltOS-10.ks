@@ -12,12 +12,13 @@ repo --name="appstream" --baseurl=https://repo.almalinux.org/almalinux/10.1/AppS
 repo --name="extras" --baseurl=https://repo.almalinux.org/almalinux/10.1/extras/$basearch/os/
 repo --name="crb" --baseurl=https://repo.almalinux.org/almalinux/10.1/CRB/$basearch/os/
 repo --name="epel" --baseurl=https://dl.fedoraproject.org/pub/epel/10.1/Everything/$basearch/
-repo --name="BasaltOS" --baseurl=https://download.copr.fedorainfracloud.org/results/forecastwolf157/BasaltOS-Repo/rhel+epel-10-$basearch/
+repo --name="baseos" --baseurl=https://repo.almalinux.org/almalinux/10.1/BaseOS/$basearch/os/ --exclude=kernel*
+repo --name="basaltos   " --baseurl=https://download.copr.fedorainfracloud.org/results/forecastwolf157/BasaltOS-Repo/rhel+epel-10-$basearch/
 # Network information
 network --activate --bootproto=dhcp --device=link --onboot=on
 
 # SELinux configuration
-selinux --permissive
+selinux --disabled
 
 # System services
 services --disabled="sshd" --enabled="NetworkManager,ModemManager"
@@ -115,6 +116,11 @@ getent group openvpn &>/dev/null || groupadd -r openvpn
 getent passwd openvpn &>/dev/null || \
     /usr/sbin/useradd -r -g openvpn -s /sbin/nologin -c OpenVPN \
         -d /etc/openvpn openvpn
+ 
+# Kill this fuckass selinux
+if [ -f /etc/selinux/config ]; then
+    sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+fi
 %end
 
 # Packages
@@ -125,18 +131,12 @@ kernel-modules
 kernel-modules-extra
 -kernel-uki-virt
 
-# The point of a live image is to install
-anaconda
-anaconda-install-env-deps
-anaconda-live
-@anaconda-tools
-# Anaconda has a weak dep on this and we don't want it on livecds, see
-# https://fedoraproject.org/wiki/Changes/RemoveDeviceMapperMultipathFromWorkstationLiveCD
--fcoe-utils
--sdubby
+# Release and branding packages!!!!!!!!!!!!!
+basalt-release
+basalt-logos
 
-# Need aajohan-comfortaa-fonts for the SVG rnotes images
-#aajohan-comfortaa-fonts
+# im still fucking testing this so this isnt permanent
+calamares
 
 # Without this, initramfs generation during live image creation fails: #1242586
 dracut-live
@@ -149,9 +149,6 @@ livesys-scripts
 
 # Mandatory to build media with livemedia-creator
 memtest86+
-
-# firefox removed - using Flathub instead
-#@internet-browser
 
 # Workstation environment group
 @^workstation-product-environment
@@ -178,7 +175,5 @@ NetworkManager-openvpn-gnome
 -hplip
 -almalinux*
 -firefox
-basalt-release
-basalt-logos
 
 %end

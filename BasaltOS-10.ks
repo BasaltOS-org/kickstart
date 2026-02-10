@@ -7,13 +7,13 @@ timezone US/Eastern
 lang en_US.UTF-8
 
 # Repos
-url --url=https://repo.almalinux.org/almalinux/10.1/BaseOS/$basearch/os/
+url --url=https://repo.almalinux.org/almalinux/10.1/BaseOS/$basearch/kickstart/
 repo --name="appstream" --baseurl=https://repo.almalinux.org/almalinux/10.1/AppStream/$basearch/os/
 repo --name="extras" --baseurl=https://repo.almalinux.org/almalinux/10.1/extras/$basearch/os/
 repo --name="crb" --baseurl=https://repo.almalinux.org/almalinux/10.1/CRB/$basearch/os/
 repo --name="epel" --baseurl=https://dl.fedoraproject.org/pub/epel/10.1/Everything/$basearch/
 repo --name="baseos" --baseurl=https://repo.almalinux.org/almalinux/10.1/BaseOS/$basearch/os/ --exclude=kernel*
-repo --name="basaltos   " --baseurl=https://download.copr.fedorainfracloud.org/results/forecastwolf157/BasaltOS-Repo/rhel+epel-10-$basearch/
+repo --name="basaltos" --baseurl=https://download.copr.fedorainfracloud.org/results/forecastwolf157/BasaltOS-Repo/rhel+epel-10-$basearch/
 # Network information
 network --activate --bootproto=dhcp --device=link --onboot=on
 
@@ -136,7 +136,14 @@ basalt-release
 basalt-logos
 
 # im still fucking testing this so this isnt permanent
-calamares
+anaconda
+anaconda-install-env-deps
+anaconda-live
+@anaconda-tools
+# Anaconda has a weak dep on this and we don't want it on livecds, see
+# https://fedoraproject.org/wiki/Changes/RemoveDeviceMapperMultipathFromWorkstationLiveCD
+-fcoe-utils
+-sdubby
 
 # Without this, initramfs generation during live image creation fails: #1242586
 dracut-live
